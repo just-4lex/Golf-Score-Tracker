@@ -133,6 +133,55 @@ function initPlayerSwitcher() {
   });
 }
 
+function buildCsv() {
+  const header = ['Hole', 'Player 1', 'Player 2', 'Player 3', 'Player 4'];
+  const rows = [header.join(',')];
+  for (let h = 0; h < HOLES; h++) {
+    const row = [
+      h + 1,
+      state.players[0][h],
+      state.players[1][h],
+      state.players[2][h],
+      state.players[3][h],
+    ].join(',');
+    rows.push(row);
+  }
+  return rows.join('\n');
+}
+
+function exportEmailCsv() {
+  const input = document.getElementById('export-email');
+  const email = (input?.value || '').trim();
+  if (!email) {
+    alert('Please enter an email address.');
+    input?.focus();
+    return;
+  }
+  const csv = buildCsv();
+  const subject = encodeURIComponent('Golf score export');
+  const body = encodeURIComponent(
+    'Golf score export (one row per hole, one column per player).\n\n' + csv
+  );
+  const mailto = `mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`;
+  window.location.href = mailto;
+}
+
+function exportDownloadCsv() {
+  const csv = buildCsv();
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `golf-scores-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function initExport() {
+  document.getElementById('email-csv')?.addEventListener('click', exportEmailCsv);
+  document.getElementById('download-csv')?.addEventListener('click', exportDownloadCsv);
+}
+
 function registerSw() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
@@ -153,6 +202,7 @@ function init() {
   updateTotal();
   updateMinusButtons();
   initNewRound();
+  initExport();
 }
 
 if (document.readyState === 'loading') {

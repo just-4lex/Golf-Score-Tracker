@@ -284,3 +284,68 @@ body {
 .app[data-player="3"] .hole-btn-plus:focus-visible {
   background: #8a3d9a;
 }
+
+/* Export */
+.export {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--sand);
+}
+
+.export-title {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.export-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.35rem;
+}
+
+.export-input {
+  width: 100%;
+  max-width: 20rem;
+  padding: 0.6rem 0.75rem;
+  font-size: 1rem;
+  border: 2px solid var(--sand);
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  background: white;
+}
+
+.export-input:focus {
+  outline: none;
+  border-color: var(--green-mid);
+  box-shadow: 0 0 0 3px rgba(45, 90, 45, 0.2);
+}
+
+.export-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.btn-export {
+  background: var(--green-mid);
+  color: white;
+}
+
+.btn-export:hover,
+.btn-export:focus-visible {
+  background: var(--green-light);
+}
+
+.btn-export-secondary {
+  background: var(--sand);
+  color: var(--text);
+}
+
+.btn-export-secondary:hover,
+.btn-export-secondary:focus-visible {
+  background: #ddd;
+}

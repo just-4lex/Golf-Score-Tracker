@@ -27,6 +27,15 @@
 
     <main class="holes">
       <div id="holes-list" class="holes-list"></div>
+      <section class="export" aria-label="Export scores">
+        <h2 class="export-title">Export to email</h2>
+        <label for="export-email" class="export-label">Email address</label>
+        <input type="email" id="export-email" class="export-input" placeholder="you@example.com" />
+        <div class="export-actions">
+          <button type="button" id="email-csv" class="btn btn-export">Email CSV</button>
+          <button type="button" id="download-csv" class="btn btn-export btn-export-secondary">Download CSV</button>
+        </div>
+      </section>
     </main>
   </div>
   <script src="app.js"></script>
