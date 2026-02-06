@@ -10,8 +10,13 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="app">
-    <header class="header">
+  <div class="app" id="app" data-player="0">
+    <header class="header header-player-0" id="header">
+      <div class="player-switcher">
+        <button type="button" id="player-prev" class="player-arrow" aria-label="Previous player">‹</button>
+        <span id="player-label" class="player-label">Player 1</span>
+        <button type="button" id="player-next" class="player-arrow" aria-label="Next player">›</button>
+      </div>
       <h1>Golf Score</h1>
       <div class="total-row">
         <span class="total-label">Total</span>

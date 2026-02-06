@@ -39,12 +39,58 @@ body {
 
 /* Header */
 .header {
-  background: var(--green-dark);
   color: var(--cream);
   padding: 1rem 1.25rem 1.25rem;
   position: sticky;
   top: 0;
   z-index: 1;
+  transition: background 0.2s ease;
+}
+
+.header-player-0 { background: #1a3c1a; }
+.header-player-1 { background: #1a3a4c; }
+.header-player-2 { background: #4c3a1a; }
+.header-player-3 { background: #3a1a4c; }
+
+.player-switcher {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.player-arrow {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  color: var(--cream);
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, transform 0.1s;
+  padding: 0;
+}
+
+.player-arrow:hover,
+.player-arrow:focus-visible {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.player-arrow:active {
+  transform: scale(0.95);
+}
+
+.player-label {
+  font-size: 1.1rem;
+  font-weight: 700;
+  min-width: 5.5rem;
+  text-align: center;
 }
 
 .header h1 {
@@ -126,9 +172,24 @@ body {
   border: 2px solid var(--sand);
 }
 
-.hole-card:focus-within {
+.app[data-player="0"] .hole-card:focus-within {
   border-color: var(--green-mid);
   box-shadow: 0 0 0 3px rgba(45, 90, 45, 0.25);
+}
+
+.app[data-player="1"] .hole-card:focus-within {
+  border-color: #2d5a7a;
+  box-shadow: 0 0 0 3px rgba(45, 90, 122, 0.25);
+}
+
+.app[data-player="2"] .hole-card:focus-within {
+  border-color: #7a6a2d;
+  box-shadow: 0 0 0 3px rgba(122, 106, 45, 0.25);
+}
+
+.app[data-player="3"] .hole-card:focus-within {
+  border-color: #6a2d7a;
+  box-shadow: 0 0 0 3px rgba(106, 45, 122, 0.25);
 }
 
 .hole-number {
@@ -198,4 +259,28 @@ body {
 .hole-btn-plus:hover,
 .hole-btn-plus:focus-visible {
   background: var(--green-light);
+}
+
+.app[data-player="1"] .hole-btn-plus {
+  background: #2d5a7a;
+}
+.app[data-player="1"] .hole-btn-plus:hover,
+.app[data-player="1"] .hole-btn-plus:focus-visible {
+  background: #3d7a9a;
+}
+
+.app[data-player="2"] .hole-btn-plus {
+  background: #7a6a2d;
+}
+.app[data-player="2"] .hole-btn-plus:hover,
+.app[data-player="2"] .hole-btn-plus:focus-visible {
+  background: #9a8a3d;
+}
+
+.app[data-player="3"] .hole-btn-plus {
+  background: #6a2d7a;
+}
+.app[data-player="3"] .hole-btn-plus:hover,
+.app[data-player="3"] .hole-btn-plus:focus-visible {
+  background: #8a3d9a;
 }

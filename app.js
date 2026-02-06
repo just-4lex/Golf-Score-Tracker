@@ -1,24 +1,43 @@
 const STORAGE_KEY = 'golf-score-tracker';
 const HOLES = 18;
+const NUM_PLAYERS = 4;
 
-function getStoredScores() {
+function getStoredState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length === HOLES) return parsed;
+      if (parsed && Array.isArray(parsed.players)) {
+        const current = Math.min(Math.max(0, parseInt(parsed.currentPlayer, 10) || 0), NUM_PLAYERS - 1);
+        const players = parsed.players
+          .slice(0, NUM_PLAYERS)
+          .map((p) => Array.isArray(p) && p.length === HOLES ? p : Array(HOLES).fill(0));
+        while (players.length < NUM_PLAYERS) players.push(Array(HOLES).fill(0));
+        return { currentPlayer: current, players };
+      }
     }
   } catch (_) {}
-  return Array(HOLES).fill(0);
+  return {
+    currentPlayer: 0,
+    players: Array.from({ length: NUM_PLAYERS }, () => Array(HOLES).fill(0)),
+  };
 }
 
-function saveScores(scores) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(scores));
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    currentPlayer: state.currentPlayer,
+    players: state.players,
+  }));
 }
 
-let scores = getStoredScores();
+const state = getStoredState();
+
+function getScores() {
+  return state.players[state.currentPlayer];
+}
 
 function updateTotal() {
+  const scores = getScores();
   const total = scores.reduce((a, b) => a + b, 0);
   const el = document.getElementById('total');
   if (el) el.textContent = total;
@@ -28,6 +47,7 @@ function renderHoles() {
   const list = document.getElementById('holes-list');
   if (!list) return;
 
+  const scores = getScores();
   list.innerHTML = '';
 
   for (let i = 0; i < HOLES; i++) {
@@ -49,40 +69,67 @@ function renderHoles() {
 
     list.appendChild(card);
   }
+}
 
-  list.addEventListener('click', (e) => {
-    const btn = e.target.closest('.hole-btn');
-    if (!btn) return;
-    const index = parseInt(btn.dataset.hole, 10);
-    const delta = parseInt(btn.dataset.delta, 10);
-    if (Number.isNaN(index) || Number.isNaN(delta)) return;
-    const next = scores[index] + delta;
-    scores[index] = Math.max(0, next);
-    saveScores(scores);
-    const scoreEl = list.querySelector(`.hole-score[data-hole="${index}"]`);
-    if (scoreEl) scoreEl.textContent = scores[index];
-    const minusBtn = list.querySelector(`.hole-btn-minus[data-hole="${index}"]`);
-    if (minusBtn) minusBtn.disabled = scores[index] === 0;
-    updateTotal();
-  });
+function onHoleListClick(e) {
+  const list = document.getElementById('holes-list');
+  const btn = e.target.closest('.hole-btn');
+  if (!btn || !list) return;
+  const index = parseInt(btn.dataset.hole, 10);
+  const delta = parseInt(btn.dataset.delta, 10);
+  if (Number.isNaN(index) || Number.isNaN(delta)) return;
+  const scores = getScores();
+  const next = scores[index] + delta;
+  scores[index] = Math.max(0, next);
+  saveState();
+  const scoreEl = list.querySelector(`.hole-score[data-hole="${index}"]`);
+  if (scoreEl) scoreEl.textContent = scores[index];
+  const minusBtn = list.querySelector(`.hole-btn-minus[data-hole="${index}"]`);
+  if (minusBtn) minusBtn.disabled = scores[index] === 0;
+  updateTotal();
 }
 
 function initNewRound() {
   document.getElementById('new-round')?.addEventListener('click', () => {
-    if (confirm('Start a new round? All scores for this round will be reset.')) {
-      scores = Array(HOLES).fill(0);
-      saveScores(scores);
+    if (confirm('Start a new round? All scores for all players will be reset.')) {
+      state.players = Array.from({ length: NUM_PLAYERS }, () => Array(HOLES).fill(0));
+      saveState();
       renderHoles();
       updateTotal();
+      updateMinusButtons();
     }
   });
 }
 
 // Disable minus when score is 0 (after render)
 function updateMinusButtons() {
+  const scores = getScores();
   document.querySelectorAll('.hole-btn-minus').forEach((btn) => {
     const index = parseInt(btn.dataset.hole, 10);
     btn.disabled = scores[index] === 0;
+  });
+}
+
+function setPlayer(index) {
+  state.currentPlayer = Math.max(0, Math.min(NUM_PLAYERS - 1, index));
+  saveState();
+  const header = document.getElementById('header');
+  const label = document.getElementById('player-label');
+  const app = document.getElementById('app');
+  if (header) header.className = 'header header-player-' + state.currentPlayer;
+  if (label) label.textContent = 'Player ' + (state.currentPlayer + 1);
+  if (app) app.setAttribute('data-player', String(state.currentPlayer));
+  renderHoles();
+  updateTotal();
+  updateMinusButtons();
+}
+
+function initPlayerSwitcher() {
+  document.getElementById('player-prev')?.addEventListener('click', () => {
+    setPlayer(state.currentPlayer - 1);
+  });
+  document.getElementById('player-next')?.addEventListener('click', () => {
+    setPlayer(state.currentPlayer + 1);
   });
 }
 
@@ -94,6 +141,14 @@ function registerSw() {
 
 function init() {
   registerSw();
+  const header = document.getElementById('header');
+  const label = document.getElementById('player-label');
+  if (header) header.className = 'header header-player-' + state.currentPlayer;
+  if (label) label.textContent = 'Player ' + (state.currentPlayer + 1);
+  const app = document.getElementById('app');
+  if (app) app.setAttribute('data-player', String(state.currentPlayer));
+  initPlayerSwitcher();
+  document.getElementById('holes-list')?.addEventListener('click', onHoleListClick);
   renderHoles();
   updateTotal();
   updateMinusButtons();
