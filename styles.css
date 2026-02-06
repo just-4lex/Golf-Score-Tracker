@@ -86,6 +86,11 @@ body {
   transform: scale(0.95);
 }
 
+.app[data-num-players="1"] .player-arrow {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .player-label {
   font-size: 1.1rem;
   font-weight: 700;
@@ -139,6 +144,12 @@ body {
 .btn-secondary:hover,
 .btn-secondary:focus-visible {
   background: rgba(255, 255, 255, 0.3);
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 /* Holes grid */
@@ -348,4 +359,111 @@ body {
 .btn-export-secondary:hover,
 .btn-export-secondary:focus-visible {
   background: #ddd;
+}
+
+/* Config modal */
+.config-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.config-modal.config-modal-visible {
+  pointer-events: auto;
+  opacity: 1;
+  visibility: visible;
+}
+
+.config-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.config-dialog {
+  position: relative;
+  background: var(--cream);
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 360px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.config-title {
+  margin: 0 0 1.25rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.config-field {
+  margin-bottom: 1rem;
+}
+
+.config-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.35rem;
+}
+
+.config-select {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  font-size: 1rem;
+  border: 2px solid var(--sand);
+  border-radius: 8px;
+  background: white;
+}
+
+.config-select:focus {
+  outline: none;
+  border-color: var(--green-mid);
+}
+
+.config-names {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.config-name-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.config-name-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  border: 2px solid var(--sand);
+  border-radius: 8px;
+  background: white;
+}
+
+.config-name-input:focus {
+  outline: none;
+  border-color: var(--green-mid);
+}
+
+.config-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--sand);
 }

@@ -1,6 +1,7 @@
 const STORAGE_KEY = 'golf-score-tracker';
-const HOLES = 18;
-const NUM_PLAYERS = 4;
+const MAX_HOLES = 18;
+const MAX_PLAYERS = 8;
+const HOLE_OPTIONS = [9, 18];
 
 function getStoredState() {
   try {
@@ -8,18 +9,42 @@ function getStoredState() {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (parsed && Array.isArray(parsed.players)) {
-        const current = Math.min(Math.max(0, parseInt(parsed.currentPlayer, 10) || 0), NUM_PLAYERS - 1);
-        const players = parsed.players
-          .slice(0, NUM_PLAYERS)
-          .map((p) => Array.isArray(p) && p.length === HOLES ? p : Array(HOLES).fill(0));
-        while (players.length < NUM_PLAYERS) players.push(Array(HOLES).fill(0));
-        return { currentPlayer: current, players };
+        const numHoles = HOLE_OPTIONS.includes(parsed.numHoles) ? parsed.numHoles : MAX_HOLES;
+        const numPlayers = Math.min(MAX_PLAYERS, Math.max(1, parseInt(parsed.numPlayers, 10) || 4));
+        const playerNames = Array.isArray(parsed.playerNames)
+          ? parsed.playerNames.slice(0, numPlayers)
+          : [];
+        while (playerNames.length < numPlayers) {
+          playerNames.push('Player ' + (playerNames.length + 1));
+        }
+        const current = Math.min(
+          Math.max(0, parseInt(parsed.currentPlayer, 10) || 0),
+          numPlayers - 1
+        );
+        const players = parsed.players.slice(0, numPlayers).map((p) => {
+          const arr = Array.isArray(p) ? p.slice(0, numHoles) : [];
+          while (arr.length < numHoles) arr.push(0);
+          return arr;
+        });
+        while (players.length < numPlayers) {
+          players.push(Array(numHoles).fill(0));
+        }
+        return {
+          currentPlayer: current,
+          players,
+          numHoles,
+          numPlayers,
+          playerNames,
+        };
       }
     }
   } catch (_) {}
   return {
     currentPlayer: 0,
-    players: Array.from({ length: NUM_PLAYERS }, () => Array(HOLES).fill(0)),
+    players: Array.from({ length: 4 }, () => Array(18).fill(0)),
+    numHoles: 18,
+    numPlayers: 4,
+    playerNames: ['Player 1', 'Player 2', 'Player 3', 'Player 4'],
   };
 }
 
@@ -27,6 +52,9 @@ function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify({
     currentPlayer: state.currentPlayer,
     players: state.players,
+    numHoles: state.numHoles,
+    numPlayers: state.numPlayers,
+    playerNames: state.playerNames,
   }));
 }
 
@@ -48,9 +76,10 @@ function renderHoles() {
   if (!list) return;
 
   const scores = getScores();
+  const numHoles = state.numHoles;
   list.innerHTML = '';
 
-  for (let i = 0; i < HOLES; i++) {
+  for (let i = 0; i < numHoles; i++) {
     const hole = i + 1;
     const value = scores[i];
     const card = document.createElement('div');
@@ -92,7 +121,9 @@ function onHoleListClick(e) {
 function initNewRound() {
   document.getElementById('new-round')?.addEventListener('click', () => {
     if (confirm('Start a new round? All scores for all players will be reset.')) {
-      state.players = Array.from({ length: NUM_PLAYERS }, () => Array(HOLES).fill(0));
+      state.players = Array.from({ length: state.numPlayers }, () =>
+        Array(state.numHoles).fill(0)
+      );
       saveState();
       renderHoles();
       updateTotal();
@@ -111,14 +142,17 @@ function updateMinusButtons() {
 }
 
 function setPlayer(index) {
-  state.currentPlayer = Math.max(0, Math.min(NUM_PLAYERS - 1, index));
+  state.currentPlayer = Math.max(0, Math.min(state.numPlayers - 1, index));
   saveState();
   const header = document.getElementById('header');
   const label = document.getElementById('player-label');
   const app = document.getElementById('app');
-  if (header) header.className = 'header header-player-' + state.currentPlayer;
-  if (label) label.textContent = 'Player ' + (state.currentPlayer + 1);
-  if (app) app.setAttribute('data-player', String(state.currentPlayer));
+  if (header) header.className = 'header header-player-' + Math.min(state.currentPlayer, 3);
+  if (label) label.textContent = state.playerNames[state.currentPlayer] || ('Player ' + (state.currentPlayer + 1));
+  if (app) {
+    app.setAttribute('data-player', String(Math.min(state.currentPlayer, 3)));
+    app.setAttribute('data-num-players', String(state.numPlayers));
+  }
   renderHoles();
   updateTotal();
   updateMinusButtons();
@@ -134,16 +168,11 @@ function initPlayerSwitcher() {
 }
 
 function buildCsv() {
-  const header = ['Hole', 'Player 1', 'Player 2', 'Player 3', 'Player 4'];
+  const names = state.playerNames.slice(0, state.numPlayers);
+  const header = ['Hole', ...names];
   const rows = [header.join(',')];
-  for (let h = 0; h < HOLES; h++) {
-    const row = [
-      h + 1,
-      state.players[0][h],
-      state.players[1][h],
-      state.players[2][h],
-      state.players[3][h],
-    ].join(',');
+  for (let h = 0; h < state.numHoles; h++) {
+    const row = [h + 1, ...state.players.slice(0, state.numPlayers).map((p) => p[h] ?? 0)].join(',');
     rows.push(row);
   }
   return rows.join('\n');
@@ -188,15 +217,121 @@ function registerSw() {
   }
 }
 
+function applyRoundConfig(numHoles, numPlayers, playerNames) {
+  const oldHoles = state.numHoles;
+  const oldPlayers = state.numPlayers;
+  state.numHoles = numHoles;
+  state.numPlayers = numPlayers;
+  state.playerNames = playerNames.slice(0, numPlayers);
+  while (state.playerNames.length < numPlayers) {
+    state.playerNames.push('Player ' + (state.playerNames.length + 1));
+  }
+  state.players = state.players.slice(0, numPlayers).map((p) => {
+    const arr = (p || []).slice(0, numHoles);
+    while (arr.length < numHoles) arr.push(0);
+    return arr;
+  });
+  while (state.players.length < numPlayers) {
+    state.players.push(Array(numHoles).fill(0));
+  }
+  state.currentPlayer = Math.min(state.currentPlayer, numPlayers - 1);
+  saveState();
+  renderHoles();
+  updateTotal();
+  updateMinusButtons();
+  setPlayer(state.currentPlayer);
+}
+
+function openConfigModal() {
+  const modal = document.getElementById('config-modal');
+  const holesSelect = document.getElementById('config-holes');
+  const playersSelect = document.getElementById('config-players');
+  const namesContainer = document.getElementById('config-player-names');
+  if (!modal || !holesSelect || !playersSelect || !namesContainer) return;
+
+  holesSelect.value = String(state.numHoles);
+  playersSelect.value = String(state.numPlayers);
+  namesContainer.innerHTML = '';
+  for (let i = 0; i < state.numPlayers; i++) {
+    const label = document.createElement('label');
+    label.className = 'config-name-label';
+    label.textContent = 'Player ' + (i + 1);
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'config-name-input';
+    input.placeholder = 'Player ' + (i + 1);
+    input.value = state.playerNames[i] || '';
+    input.dataset.index = String(i);
+    namesContainer.appendChild(label);
+    namesContainer.appendChild(input);
+  }
+  modal.classList.add('config-modal-visible');
+}
+
+function closeConfigModal() {
+  document.getElementById('config-modal')?.classList.remove('config-modal-visible');
+}
+
+function saveConfig() {
+  const holesSelect = document.getElementById('config-holes');
+  const playersSelect = document.getElementById('config-players');
+  const nameInputs = document.querySelectorAll('.config-name-input');
+  if (!holesSelect || !playersSelect) return;
+
+  const numHoles = parseInt(holesSelect.value, 10) || 18;
+  const numPlayers = Math.min(MAX_PLAYERS, Math.max(1, parseInt(playersSelect.value, 10) || 4));
+  const playerNames = Array.from(nameInputs)
+    .slice(0, numPlayers)
+    .map((input) => (input.value || '').trim() || ('Player ' + (parseInt(input.dataset.index, 10) + 1)));
+  while (playerNames.length < numPlayers) {
+    playerNames.push('Player ' + (playerNames.length + 1));
+  }
+  applyRoundConfig(numHoles, numPlayers, playerNames);
+  closeConfigModal();
+}
+
+function renderConfigPlayerNames() {
+  const playersSelect = document.getElementById('config-players');
+  const namesContainer = document.getElementById('config-player-names');
+  if (!playersSelect || !namesContainer) return;
+  const numPlayers = Math.min(MAX_PLAYERS, Math.max(1, parseInt(playersSelect.value, 10) || 4));
+  namesContainer.innerHTML = '';
+  for (let i = 0; i < numPlayers; i++) {
+    const label = document.createElement('label');
+    label.className = 'config-name-label';
+    label.textContent = 'Player ' + (i + 1);
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'config-name-input';
+    input.placeholder = 'Player ' + (i + 1);
+    input.value = (state.playerNames[i] || '').trim() || '';
+    input.dataset.index = String(i);
+    namesContainer.appendChild(label);
+    namesContainer.appendChild(input);
+  }
+}
+
+function initConfig() {
+  document.getElementById('configure-round')?.addEventListener('click', openConfigModal);
+  document.getElementById('config-cancel')?.addEventListener('click', closeConfigModal);
+  document.getElementById('config-save')?.addEventListener('click', saveConfig);
+  document.getElementById('config-backdrop')?.addEventListener('click', closeConfigModal);
+  document.getElementById('config-players')?.addEventListener('change', renderConfigPlayerNames);
+}
+
 function init() {
   registerSw();
   const header = document.getElementById('header');
   const label = document.getElementById('player-label');
-  if (header) header.className = 'header header-player-' + state.currentPlayer;
-  if (label) label.textContent = 'Player ' + (state.currentPlayer + 1);
+  if (header) header.className = 'header header-player-' + Math.min(state.currentPlayer, 3);
+  if (label) label.textContent = state.playerNames[state.currentPlayer] || ('Player ' + (state.currentPlayer + 1));
   const app = document.getElementById('app');
-  if (app) app.setAttribute('data-player', String(state.currentPlayer));
+  if (app) {
+    app.setAttribute('data-player', String(Math.min(state.currentPlayer, 3)));
+    app.setAttribute('data-num-players', String(state.numPlayers));
+  }
   initPlayerSwitcher();
+  initConfig();
   document.getElementById('holes-list')?.addEventListener('click', onHoleListClick);
   renderHoles();
   updateTotal();

@@ -22,7 +22,10 @@
         <span class="total-label">Total</span>
         <span id="total" class="total-value">0</span>
       </div>
-      <button type="button" id="new-round" class="btn btn-secondary">New round</button>
+      <div class="header-actions">
+        <button type="button" id="configure-round" class="btn btn-secondary">Configure round</button>
+        <button type="button" id="new-round" class="btn btn-secondary">New round</button>
+      </div>
     </header>
 
     <main class="holes">
@@ -38,6 +41,42 @@
       </section>
     </main>
   </div>
+
+  <div id="config-modal" class="config-modal" role="dialog" aria-labelledby="config-title" aria-modal="true">
+    <div id="config-backdrop" class="config-backdrop"></div>
+    <div class="config-dialog">
+      <h2 id="config-title" class="config-title">Configure round</h2>
+      <div class="config-field">
+        <label for="config-holes" class="config-label">Holes</label>
+        <select id="config-holes" class="config-select">
+          <option value="9">9</option>
+          <option value="18">18</option>
+        </select>
+      </div>
+      <div class="config-field">
+        <label for="config-players" class="config-label">Number of players</label>
+        <select id="config-players" class="config-select">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+        </select>
+      </div>
+      <div class="config-field">
+        <span class="config-label">Player names</span>
+        <div id="config-player-names" class="config-names"></div>
+      </div>
+      <div class="config-actions">
+        <button type="button" id="config-cancel" class="btn btn-export-secondary">Cancel</button>
+        <button type="button" id="config-save" class="btn btn-export">Save</button>
+      </div>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>
