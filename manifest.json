@@ -1,0 +1,10 @@
+{
+  "name": "Golf Score Tracker",
+  "short_name": "Golf Score",
+  "description": "Track shots per hole during your round",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1a3c1a",
+  "theme_color": "#1a3c1a",
+  "orientation": "portrait"
+}

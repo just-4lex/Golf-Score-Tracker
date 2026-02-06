@@ -1,0 +1,201 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --green-dark: #1a3c1a;
+  --green-mid: #2d5a2d;
+  --green-light: #3d7a3d;
+  --green-bright: #4a9c4a;
+  --cream: #f5f0e6;
+  --sand: #e8e0d0;
+  --text: #1a1a1a;
+  --text-muted: #5a5a5a;
+  --danger: #c44;
+  --safe: #2d5a2d;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--green-dark);
+  color: var(--text);
+  min-height: 100vh;
+  min-height: 100dvh;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--cream);
+}
+
+/* Header */
+.header {
+  background: var(--green-dark);
+  color: var(--cream);
+  padding: 1rem 1.25rem 1.25rem;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.header h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.total-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.total-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.total-value {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.btn {
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--cream);
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus-visible {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Holes grid */
+.holes {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.holes-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 380px) {
+  .holes-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.hole-card {
+  background: white;
+  border-radius: 12px;
+  padding: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  border: 2px solid var(--sand);
+}
+
+.hole-card:focus-within {
+  border-color: var(--green-mid);
+  box-shadow: 0 0 0 3px rgba(45, 90, 45, 0.25);
+}
+
+.hole-number {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hole-score {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--green-dark);
+  line-height: 1;
+  min-width: 2.5rem;
+  text-align: center;
+}
+
+.hole-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  justify-content: center;
+}
+
+.hole-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  font-size: 1.35rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, transform 0.1s;
+  flex-shrink: 0;
+}
+
+.hole-btn:active {
+  transform: scale(0.92);
+}
+
+.hole-btn-minus {
+  background: var(--sand);
+  color: var(--text);
+}
+
+.hole-btn-minus:hover,
+.hole-btn-minus:focus-visible {
+  background: #ddd;
+}
+
+.hole-btn-minus:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hole-btn-plus {
+  background: var(--green-mid);
+  color: white;
+}
+
+.hole-btn-plus:hover,
+.hole-btn-plus:focus-visible {
+  background: var(--green-light);
+}

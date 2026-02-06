@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#1a3c1a" />
+  <meta name="description" content="Track your shots per hole on the golf course" />
+  <title>Golf Score Tracker</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>Golf Score</h1>
+      <div class="total-row">
+        <span class="total-label">Total</span>
+        <span id="total" class="total-value">0</span>
+      </div>
+      <button type="button" id="new-round" class="btn btn-secondary">New round</button>
+    </header>
+
+    <main class="holes">
+      <div id="holes-list" class="holes-list"></div>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
